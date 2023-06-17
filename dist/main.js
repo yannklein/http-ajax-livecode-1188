@@ -93,48 +93,45 @@
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-const authorization = "Bearer sk_41937af00f727ea497f1465cc52f1186";
-
-// PSEUDO CODE!
-
-// 1. Select elements
-//    -> the form (input, submit button)
-//    -> table cells
-const email = document.querySelector("#clearbitEmail");
-const submit = document.querySelector("#clearbitSubmit");
-
-const userName = document.querySelector("#userName");
-const userEmail = document.querySelector("#userEmail");
-const userBio = document.querySelector("#userBio");
-const userLocation = document.querySelector("#userLocation");
-
-// 2. Listen to an event (click on the submit btn)
-// define first, call next
-const getInfo = (event) => {
-  event.preventDefault();
-  const emailValue = email.value;
-  console.log(emailValue);
-  // 2.5. Fetch Clearbit API
-  fetch(`https://person.clearbit.com/v2/combined/find?email=${emailValue}`, {
-    headers: {Authorization: authorization}
-  })
-  .then(res => res.json())
-  .then((data) => {
-    console.log(data)
-    // 3. Change the DOM (add data to table cells)
-      userName.innerText = data.person.name.fullName
-      userEmail.innerText = data.person.email
-      userBio.innerText = data.person.bio
-      userLocation.innerText = data.person.location
-  });
-
-
-  // GET https://person.clearbit.com/v2/combined/find?email=:email
-
-
+const displayPerson = (person) => {
+  const name = document.querySelector("#userName");
+  const email = document.querySelector("#userEmail");
+  const bio = document.querySelector("#userBio");
+  const location = document.querySelector("#userLocation");
+  name.innerText = person.name.fullName;
+  email.innerText = person.email;
+  bio.innerText = person.bio;
+  location.innerText = person.location;
 };
 
-submit.addEventListener("click", getInfo);
+const fetchClearbit = (mail) => {
+  const authorization = "Bearer sk_41937af00f727ea497f1465cc52f1186";
+  fetch(`https://person.clearbit.com/v2/combined/find?email=${mail}`,{
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 5.1; rv:15.0) Gecko/20100101 Firefox/15.0.1', 'Authorization': authorization
+    }
+  })
+    .then(response => response.json())
+    .then((data) => {
+    //  const results = {fullName: data.person.name.fullName};
+    // 4. update DOM accordingly (display the 4 results)
+      displayPerson(data.person);
+  })
+};
+
+const stalkSomeone = (event) => {
+  const input = document.querySelector("#clearbitEmail");
+  // (prevent default behavior)
+  event.preventDefault();
+  console.log(event);
+  // 3. fetch API url 
+  fetchClearbit(input.value);
+}
+
+// 1. select every elements that will be interacted with (mail address (input), submit button, 4 results)
+submit = document.querySelector("#clearbitSubmit");
+// 2. listen to an event (click on submit button)
+submit.addEventListener("click", stalkSomeone);
 
 /***/ })
 
